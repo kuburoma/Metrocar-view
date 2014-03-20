@@ -1,0 +1,13 @@
+<resources>
+
+    <string name="app_name">Metrocar</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="menu_settings">Settings</string>
+    <string name="title_activity_main">Metrocar</string>
+    <string name="spd">Speed</string>
+    <string name="title_activity_connect">Speed</string>
+    <string name="title_connected">Connected</string>
+    <string name="title_connecting">Connecting</string>
+    <string name="title_not_connected">Not connected</string>
+    <string name="title_activity_connect">Connect</string>
+</resources>
