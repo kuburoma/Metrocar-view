@@ -237,7 +237,7 @@
             android:layout_below="@+id/l8"
             android:gravity="center"
             android:paddingTop="10dp"
-            android:text="Mobilize Unit" />
+            android:text="Switch Off" />
     </RelativeLayout>
 
 </ScrollView>

@@ -43,23 +43,10 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		settings = (Button) findViewById(R.id.settings);
-		settings.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				settings();
-			}
-		});
-
 		bluetoothSettings = (Button) findViewById(R.id.bluetooth_setting);
 		bluetoothSettings.setOnClickListener(new View.OnClickListener() {
 			public void onClick(View v) {
 				bluetoothSetting();
-			}
-		});
-		lockBluetoothSettings = (Button) findViewById(R.id.lock_bluetooth_setting);
-		lockBluetoothSettings.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				lockBluetoothSetting();
 			}
 		});
 
@@ -70,24 +57,6 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		reservation = (Button) findViewById(R.id.reservation);
-		reservation.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				reservation();
-			}
-		});
-		lock = (Button) findViewById(R.id.lock);
-		lock.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				lock();
-			}
-		});
-		lock = (Button) findViewById(R.id.settings_txt);
-		lock.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				txt();
-			}
-		});
 	}
 
 	public void startRecording() {
@@ -96,49 +65,18 @@ public class MainActivity extends Activity {
 			btAdapter.enable();
 			return;
 		}
-		Intent intent = new Intent(this, ControlActivity.class);
+		Intent intent = new Intent(this, ConnectionActivity.class);
 		startActivity(intent);
 	}
 
-	public void settings() {
-		Intent intent = new Intent(this, SettingsActivity.class);
-		startActivity(intent);
-	}
 
 	public void bluetoothSetting() {
 		Intent intent = new Intent(this, BluetoothActivity.class);
 		startActivity(intent);
 	}
 	
-	public void lockBluetoothSetting() {
-		Intent intent = new Intent(this, LockBluetoothActivity.class);
-		startActivity(intent);
-	}
-
 	public void database() {
 		Intent intent = new Intent(this, RideRecord.class);
-		startActivity(intent);
-	}
-
-	public void reservation() {
-		Intent intent = new Intent(this, ReservationActivity.class);
-		startActivity(intent);
-	}
-	
-	public void lock() {
-		SharedPreferences settings = getSharedPreferences("my", 0);
-		String address = settings.getString("LockAddress", "");
-		if (address.equals("")) {
-			Toast.makeText(getApplicationContext(), "Lock bluetooth wasnt set",
-					Toast.LENGTH_SHORT).show();
-			return;
-		}
-		Intent intent = new Intent(this, LockActivity.class);
-		startActivity(intent);
-	}
-
-	public void txt() {
-		Intent intent = new Intent(this, TextSettingsActivity.class);
 		startActivity(intent);
 	}
 

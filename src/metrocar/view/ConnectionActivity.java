@@ -64,8 +64,6 @@ public class ConnectionActivity extends Activity {
 
 	private String message;
 	private String id;
-	private String secretKey;
-	private String unitId;
 
 	// Key names received from the BluetoothChatService Handler
 	public static final String DEVICE_NAME = "device_name";
@@ -77,159 +75,20 @@ public class ConnectionActivity extends Activity {
 
 		SharedPreferences settings = getSharedPreferences("my", 0);
 		String addressObd = settings.getString("ObdAddress", "");
-		String addressLock = settings.getString("LockAddress", "");
-		boolean useLock = settings.getBoolean("LockEnable", false);
-		String lockPass = settings.getString("LockPass", "");
-
-		secretKey = settings.getString("secretKey", "");
-		unitId = settings.getString("unitId", "");
 
 		BluetoothAdapter btAdapter = BluetoothAdapter.getDefaultAdapter();
 		if (!btAdapter.isEnabled())
 			btAdapter.enable();
-
-		if (useLock) {
-			mc = new MainCore(
-					getApplicationContext(),
-					(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE),
-					unitId, secretKey, addressObd, addressLock, lockPass,
-					mHandler,textSettings());
-		} else {
-			mc = new MainCore(
-					getApplicationContext(),
-					(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE),
-					unitId, secretKey, addressObd, mHandler,textSettings());
-		}
-		if (mc.setUp()) {
-			logginView();
-		} else {
-			Intent intent = new Intent(getApplicationContext(),
-					MainActivity.class);
-			startActivity(intent);
-			Toast.makeText(getApplicationContext(),
-					("Set all required settings"), Toast.LENGTH_LONG).show();
-		}
-
-	}
-
-	private UnitSettings textSettings() {
-		UnitSettings unit = new UnitSettings();
-		SharedPreferences settings = getSharedPreferences("textSettings", 0);
-		if (settings.contains("doLogGPSTracker")) {
-			unit.setDoLogGPSTracker(settings.getBoolean("doLogGPSTracker",
-					false));
-		}
-		if (settings.contains("doLogGet")) {
-			unit.setDoLogGet(settings.getBoolean("doLogGet", false));
-		}
-		if (settings.contains("doLogPost")) {
-			unit.setDoLogPost(settings.getBoolean("doLogPost", false));
-		}
-		if (settings.contains("doLogUnitEngine")) {
-			unit.setDoLogUnitEngine(settings.getBoolean("doLogUnitEngine",
-					false));
-		}
-		if (settings.contains("doLogMainCore")) {
-			unit.setDoLogMainCore(settings.getBoolean("doLogMainCore", false));
-		}
-		if (settings.contains("doLogCheckInternetConnection")) {
-			unit.setDoLogCheckInternetConnection(settings.getBoolean(
-					"doLogCheckInternetConnection", false));
-		}
-		if (settings.contains("doLogLockEngine")) {
-			unit.setDoLogLockEngine(settings.getBoolean("doLogLockEngine",
-					false));
-		}
-		if (settings.contains("doLogDatabaseController")) {
-			unit.setDoLogDatabaseController(settings.getBoolean(
-					"doLogDatabaseController", false));
-		}
-		if (settings.contains("doLogObdMessage")) {
-			unit.setDoLogObdMessage(settings.getBoolean("doLogObdMessage",
-					false));
-		}
-		if (settings.contains("authorizedPostPeriod")) {
-			unit.setAuthorizedPostPeriod(settings.getLong(
-					"authorizedPostPeriod", 0));
-		}
-		if (settings.contains("authorizedGetPeriod")) {
-			unit.setAuthorizedGetPeriod(settings.getLong("authorizedGetPeriod",
-					0));
-		}
-		if (settings.contains("unauthorizedGetPeriod")) {
-			unit.setUnauthorizedGetPeriod(settings.getLong(
-					"unauthorizedGetPeriod", 0));
-		}
-		if (settings.contains("unauthorizedPostPeriod")) {
-			unit.setUnauthorizedPostPeriod(settings.getLong(
-					"unauthorizedPostPeriod", 0));
-		}
-		if (settings.contains("get_request")) {
-			unit.setGet_request(settings.getString("get_request", ""));
-		}
-		if (settings.contains("post")) {
-			unit.setPost(settings.getString("post", ""));
-		}
-		if (settings.contains("open_advance")) {
-			unit.setOpen_advance(settings.getLong("open_advance", 0));
-		}
-		if (settings.contains("end_advance")) {
-			unit.setEnd_advance(settings.getLong("end_advance", 0));
-		}
-		if (settings.contains("min_time_bw_updates")) {
-			unit.setMin_time_bw_updates(settings.getLong("min_time_bw_updates",
-					0));
-		}
-		if (settings.contains("min_distance_change_for_server")) {
-			unit.setMin_distance_change_for_server(settings.getLong(
-					"min_distance_change_for_server", 0));
-		}
-		if (settings.contains("post_limit")) {
-			unit.setPost_limit(settings.getString("post_limit", ""));
-		}
-
-		return unit;
-	}
-
-	private void logginView() {
-		setContentView(R.layout.activity_login);
-
-		userText = (EditText) findViewById(R.id.edittext_login_user_name);
-		passwordText = (EditText) findViewById(R.id.edittex_login_password);
-
-		loginButton = (Button) findViewById(R.id.button_login);
-		loginButton.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
-				if (userText.getText().toString().equals(unitId)
-						&& passwordText.getText().toString().equals(secretKey)) {
-					Toast.makeText(getApplicationContext(),
-							"Set all needed parametres", Toast.LENGTH_SHORT)
-							.show();
-					Intent intent = new Intent(getApplicationContext(),
-							MainActivity.class);
-					startActivity(intent);
-					return;
-				}
-				if (mc.authorizedUser(userText.getText().toString(),
-						passwordText.getText().toString())) {
-					authorizationView();
-				} else {
-					Toast.makeText(getApplicationContext(),
-							("Wrong username or password"), Toast.LENGTH_LONG)
-							.show();
-				}
-			}
-
-		});
-
-	}
-
-	private void authorizationView() {
+		mc = new MainCore(
+				getApplicationContext(),
+				(ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE),
+				addressObd, mHandler);
+		mc.startRecordingNoUser();
 		connectionView();
 	}
-
-	private void unauthorizationView() {
-		logginView();
+	
+	private void close(){
+		this.finish();
 	}
 
 	private void connectionView() {
@@ -239,12 +98,10 @@ public class ConnectionActivity extends Activity {
 			public void onClick(DialogInterface dialog, int which) {
 				switch (which) {
 				case DialogInterface.BUTTON_POSITIVE:
-					mc.unauthorizedUser();
-					unauthorizationView();
+					mc.stopRecordingNoUser();
+					close();
 					break;
-
 				case DialogInterface.BUTTON_NEGATIVE:
-					// No button clicked
 					break;
 				}
 			}
@@ -345,45 +202,6 @@ public class ConnectionActivity extends Activity {
 		@Override
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
-			case HandlerLabels.POST:
-				message = (String) msg.obj;
-				id = intToHex(msg.arg1);
-				switch (msg.arg1) {
-				case HandlerLabels.POST_ERROR:
-					Toast.makeText(getApplicationContext(),
-							("PostError: " + message), Toast.LENGTH_LONG)
-							.show();
-					break;
-
-				case HandlerLabels.POST_WARNING:
-					Toast.makeText(getApplicationContext(),
-							("PostWar: " + message), Toast.LENGTH_LONG).show();
-					break;
-				case HandlerLabels.POST_AUTHENTICATION_FAILED:
-					Toast.makeText(getApplicationContext(),
-							("PostWar: " + message), Toast.LENGTH_LONG).show();
-					break;
-				}
-				break;
-			case HandlerLabels.GET:
-				message = (String) msg.obj;
-				id = intToHex(msg.arg1);
-				switch (msg.arg1) {
-				case HandlerLabels.GET_ERROR:
-					Toast.makeText(getApplicationContext(),
-							("GetError: " + message), Toast.LENGTH_LONG).show();
-					break;
-
-				case HandlerLabels.GET_WARNING:
-					Toast.makeText(getApplicationContext(),
-							("GetWar: " + message), Toast.LENGTH_LONG).show();
-					break;
-				case HandlerLabels.GET_AUTHENTICATION_FAILED:
-					Toast.makeText(getApplicationContext(),
-							("GetWar: " + message), Toast.LENGTH_LONG).show();
-					break;
-				}
-				break;
 			case HandlerLabels.OBD:
 				switch (msg.arg1) {
 				case HandlerLabels.OBD_CYCLE_COMPLETED:
